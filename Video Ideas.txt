@@ -1,0 +1,25 @@
+Scripts/Programming:
+- Automating something
+- setting up my website
+- 
+
+Networking:
+- Set up vyos
+- packet tracer scenario
+- 
+
+Malware Analysis:
+- start off slow with writing a C program and reversing it
+
+Guides/How-To:
+- refer to how-to on github
+- main frame basic setup
+
+Forensics:
+- Using WinHex to break down an image (HDD)
+- fragger tool
+- 
+
+General:
+- Setting up Active Directory
+- 
