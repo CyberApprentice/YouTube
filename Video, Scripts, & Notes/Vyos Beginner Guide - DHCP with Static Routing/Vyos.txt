@@ -1,0 +1,41 @@
+YouTube Link: https://youtu.be/0W5sbFg8SBA
+
+Website: https://cyberapprenticeblog.wordpress.com/2018/12/21/vyos-vyatta-duo-routing/
+
+script:
+Cyber Apprentice here. We're going to cover a duo Vyos setup with DHCP and static routing. Vyos is a open source network operating system based on Debian that serves as a router. For a more detailed guide, refer to my article in the description below. Let's step into it.
+
+First, we're going to download the iso from the website. You have the alternative to download the OVA that's already fully setup, but we're going to go through the entire process step-by-step. Once you're at the website, find "stable release", select the 64bit or 32bit iso, and download.
+
+After downloaded, we're going to create a virtual machine, or VM for short, in VMware. It's important to know how you're going to provision so refer to Vyos minimum recommendations of 512MB of RAM, 2GB of storage, and one processor.
+
+Our topology is going to reflect this image here where we have two client networks, VMnet 11 and VMnet 13, and a network connecting the routers, VMnet 12. Now let's create the first Vyos.
+
+To create the VM, select file > New VM > Typical > Next > Select the image > Next > Rename the VM > Next > Resize based off Vyos minimum recommendations and your requirements > Next > Ensure the power on checkbox is not selected > Finish
+
+Then edit the VM settings, add a network adapter > set the interfaces as their perspective networks. In our case, our first interfaces for both Vyos1 and later Vyos2 will represent the router's network, VMnet 12. And our second interface will be VMnet 11, representing the client network. The order doesn't matter, as long as your consistent.Select OK. Power on.
+
+Once you're greeted with the login prompt, use the default login credentials, "vyos" for both username and password. If you're using the ova, you won't have to do these next few steps as it'll already be configured, but for .iso users, we have to install our first image to disk. To do so, we type "install image" and follow the prompts, clicking enter to continue with the defaults. [Pause...] Make sure for this prompt, you type yes to continue with the installation process. [Pause...] Ensure your passwords are always strong and unique, meaning 8 or more alpha, numeric, and special character combinations, especially for network devices in a production environment. Once completed, poweroff the VM so we can alter a few settings.
+
+Go back and edit the VM's settings where we're going to remove the ISO on bootup. We're going to delete the device all together since we don't need it. Click OK to confirm and turn the VM back on to boot into GRUB.
+
+Now that the setup process for the VM is complete, we're going to begin setting up our Vyos. Don't forget we have two Vyos VMs to setup so you have the option to completely set up one and duplicate the completed Vyos while only having to manually change the IP addresses used, or just repeat the entire process. I prefer to do it all over again for experience, testing connectivity, and it doesn't take long once you get the hang of it.
+
+Viewing our current setup using the command "show interfaces", We see our two interfaces, again the first interface, eth0, will be the router network, and the second, eth1 will be the client network for both Vyoses.
+
+I'm going to quickly demonstrate using the OVA. Simply double-click to import into VMware, rename, adjust the network interfaces, and power on. You'll see that we've booted into GRUB and ready to begin configuring.
+
+Use the command "conf" or "configure" to begin editing VyOS. Think of this as ascending to administrative or root-level privledges.
+
+Here on VyOS1, we're going to configure our interfaces to have IP addresses. To do so, we use the command for our first interface, "set interface ethernet eth0 address 1.1.1.1/30". We use the CIDR 30 because we only have two routers. And for our second interface, we use "set interface ethernet eth1 address 192.168.1.254/24". Then use "commit && save" or else the settings won't take effect and you'll lose them on bootup. Type "exit" and "show interfaces" to see the changes. I'll demonstrate the same process on VyOS2 but using the addresses 1.1.1.2/30 and 172.16.0.254/24.
+
+If you use the OVA version, the first interface has dhcp preconfigured, you'll have to delete the dhcp to provide your own static IP address. We do that here by using the command, "delete interface ethernet eth0 address dhcp", and now we're able to commit && save
+
+With the static IP addresses set, we're able to ping each router's first interface since they're on the same network, but not the second interface. We'll get there...Right now, we're going to setup DHCP.
+
+In VyOS1, we'll begin using the command "edit service dhcp-server shared-network-name (name the subnet, I chose..) Main subnet 192.168.1.0/24". We'll proceed with setting the default gateway, DNS server, and range of addressiable ip addresses. Finally, commit and save and we'll test if DHCP works or not using a separate VM. Make sure the VM is on the same network as the router. As we boot into the Ubuntu client, we see that we've successfully been assigned an address. We're also able to ping our gateway's interfaces successfully, however, we're not able to ping the other router. 
+
+I'll quickly demonstrate setting up DHCP for VyOS2 and its success and failures with pinging. The process is the same as VyOS1, except we're using the IP address subnet of 172.16.0.0/24. As we ping, we are able to connect to our router succesffully however, we see two issues. The first is 100% packet loss. This is because the router doesn't know what to do with the packets, so it drops it. The other error, "Destination net unreachable", is that our router doesn't know how to reach that network. We'll fix both of these errors by setting static routes on both routers.
+
+Static routing is similar in concept to static IP addressing, as we've set previously. We manually add to the routing tables the paths to take based off the destination and source. Our goal is to fix the pinging errors we seen so the clients can communicate across networks. On VyOS1, we input the command, "set protocols static route 172.16.0.0/24 next-hop 1.1.1.2" and commit and save. We switch over to VyOS2 and apply the command "set protocols static route 192.168.1.0/24 next-hop 1.1.1.1". Remember, each router is aware of the other router because they're on the same network, and the routers can communicate with anything within their client network so we simply forward the traffic to the node that knows what to do with i t. Now we're able to successfully ping across both networks without any errors. Here's a final visual representation of the topography we've achieved and that concludes this video! Again, for a more in-depth guide, please refer to my article in the description. Thank you and best of luck moving forward!
+
