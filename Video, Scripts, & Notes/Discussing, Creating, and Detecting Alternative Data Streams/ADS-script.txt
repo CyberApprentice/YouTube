@@ -1,7 +1,7 @@
-ADS script: 1/29/19 - 
+ADS script: 1/29/19 - 2/3/19
 
 Article: https://cyberapprenticeblog.wordpress.com/2018/12/23/alternate-data-streams-ads/
-YouTube: 
+YouTube: https://youtu.be/lpyvhqxgq4I
 Other Links: https://itsmyurls.com/cyberapprentice?ref=widget
 
 CyberApprentice here! Let's talk about alternative data streams, ADS for short. I assume it's known as a common hiding technique, but in reality, it's not a strong one at all. It's unseen to the eye but revealed by tools. For more indepth discussion and details, please see my article in the description below.
