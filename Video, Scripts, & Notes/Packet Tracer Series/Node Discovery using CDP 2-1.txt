@@ -1,0 +1,35 @@
+---- CDP (cisco discovery protocol) ------
+    // enabled globally by default on older machines
+
+
+Router(config)  # hostname R1
+R1(config)      # int s2/0
+R1(config-if)   # ip addr 1.1.1.1 255.255.255.252
+                # no shut
+                # end
+
+Router(config)  # hostname R2
+R2(config)      # int s2/0
+R2(config-if)   # ip addr 1.1.1.2 255.255.255.252
+                # no shut
+                # cdp ?
+                    // enable cdp by interface
+                # exit
+R2(config)      # cdp ?
+                    // enable cdp globally
+R2              # ping 1.1.1.1
+                # show cdp ?
+                # show cdp entry ?
+                # show cdp entry *
+                # show cdp interface s2/0
+                # show cdp neighbors
+                # show cdp neighbors detail
+                    // compare with show cdp entry * on R1
+
+
+    ** added sniffer **
+R2(config)      # int f0/0
+R2(config-if)   # no shut
+                
+    ** did not include but always disable CDP on access ports **
+R2(config-if)   # no cdp enable
