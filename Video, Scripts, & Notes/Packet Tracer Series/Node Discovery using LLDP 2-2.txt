@@ -9,21 +9,28 @@ Router          # show lldp
 Router          # conf t
 Router(config)  # hostname R1
 R1(config)      # lldp ?
-                    // set LLDP globally (only option in packet tracer)
+                    // enable LLDP globally
                 # lldp run
-                # int s2/0
+                # int f0/0
+                    // not configurable through serial links
 R1(config-if)   # ip addr 192.168.1.1 255.255.255.252
                 # no shut
                 # lldp ?
-                    // cannot set LLDP by interface in Packet Tracer
+                # lldp transmit
+                    // advertise lldp
+                # lldp receive
+                    // receive lldp
                 # end
 
 Router(config)  # hostname R2
 R2(config)      # lldp run
-                # int s2/0
+                # int f0/0
 R2(config-if)   # ip addr 192.168.1.2 255.255.255.252
                 # no shut
+                # lldp receive
+                # lldp transmit
                 # end
 R2(config)      # show lldp ?
                 # show lldp 
                 # show lldp neighbors
+                # show lldp neighbors detail
