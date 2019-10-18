@@ -1,0 +1,46 @@
+-- setup static routes --
+
+IP sheet:
+PC1 -   f0/0 =      192.168.1.2/24
+        gateway =   192.168.1.1 
+R1  -   s2/0 =      1.1.1.1/30
+        f0/0 =      192.168.1.1/24
+R2  -   s2/0 =      1.1.1.2/30
+        f0/0 =      10.1.1.1/30
+SRV1-   f0/0 =      10.1.1.2/24
+        gateway =   10.1.1.1
+
+
+// To connect to a different network from an end device, a gateway is needed because it has the routing table to route between networks.
+
+R1              # show ip route
+                # show ip route summary
+                # conf t
+R1(config)      # hostname R1
+                # int s2/0
+R1(config-if)   # ip addr 1.1.1.1 255.255.255.252
+                # no shut
+                # int f0/0
+                # ip addr 192.168.1.1 255.255.255.0
+                # no shut
+                # ex
+R1(config)      # ip route ?
+                # ip route 0.0.0.0 ?
+                # ip route 0.0.0.0 0.0.0.0 ?
+                # ip route 0.0.0.0 0.0.0.0 s2/0    (CTRL+U)         // this will effectively function as a default route for the router. Any unknown traffic will be sent through the s2/0 interface. It will also be recognized as a "candidate default route"
+                # ip route 10.1.1.0 255.255.255.0 s2/0      // However, for this example, we know the route and will explicitly set it
+                # end
+                # show ip route     // we already know how to reach the 192.168.1.0/24 network so setting a route for connected routes is not needed.
+
+R2(config)      # hostname R2
+                # int s2/0
+R2(config-if)   # ip addr 1.1.1.2 255.255.255.252
+                # no shut
+                # int f0/0
+                # ip addr 10.1.1.1 255.255.255.0
+                # no shut
+                # ex
+R2(config)      # ip route 192.168.1.0 255.255.255.0 s2/0      // to reach the 192.168.1.0 network, we forward traffic out of the s2/0 interface
+                # end
+
+** ping test **
