@@ -1,0 +1,31 @@
+Setup commands (not shown):
+
+Router(config)  # hostname R1
+R1(config)      # int f0/0
+R1(config-if)   # ip addr 192.168.1.1 255.255.255.0
+                # no shut
+                # int f1/0
+                # ip addr 10.0.0.1 255.0.0.0 
+                # no shut
+// pinged end devices
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// show both ping
+                        # ip access-list standard 1
+R1(config-std-nacl)     # permit 192.168.1.2 0.0.0.0
+                        # ex
+R1(config)              # int f1/0
+
+// place standard ACLs as close to the destination as possible
+
+R1(config-if)           # ip access-group 1 out
+                        # end
+R1                      # show ip access-lists 1
+                        # show ip int f1/0
+                        # debug ip packet
+// show both ping
+
+Additional Notes:
+- standard acl = numbered 1-99
+- There is a deny all all at the end of every ACL that has at least one rule = implicit deny
