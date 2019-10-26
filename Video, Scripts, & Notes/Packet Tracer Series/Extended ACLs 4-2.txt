@@ -16,10 +16,13 @@ R1(config-std-nacl) # permit ?
 
 R1(config)          # int f0/0
 R1(config-if)       # ip access-group permit-one-ftp in
-
+                    # end
+R1                  # debug ip packet
 // remember the implicit deny!
 * FTP is running on servers by default
 // ftp 10.0.0.2     
+
+R1                  # show access-lists permit-one-ftp
 
 
 Additional note(s):
