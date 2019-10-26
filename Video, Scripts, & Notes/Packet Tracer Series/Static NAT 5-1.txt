@@ -1,0 +1,45 @@
+1. Configure interfaces as inside and local
+2. set up the 1-to-1 NAT
+
+R1(config)      # int f0/0
+R1(config-if)   # ip nat ?
+                # ip nat inside
+                # int f1/0
+                # ip nat outside
+                # ex
+R1(config)      # ip nat ?
+                # ip nat inside ?
+                # ip nat inside source ?
+                # ip nat inside source static 
+                # ip nat inside source static 192.168.1.3 ?
+                # ip nat inside source static 192.168.1.3 1.1.1.1 
+// In other words; translate anything 192.168.1.3 from the LAN to 1.1.1.1 out into the WAN
+
+                # end
+R1              # debug ip packet
+                # show ip nat ?
+                # show ip nat statistics
+// We can see the outside and inside interfaces. Also, we see the number of NAT configs
+                # show ip nat translations
+* ping test
+                # show ip nat statistics
+                # show ip nat translations
+// Now we will statically set the outside 
+                # conf t
+R1(config)      # no ip nat inside source static 192.168.1.3 1.1.1.1 
+                # ip nat outside source static 10.0.0.2 1.1.1.1
+// In other words; traffic coming from the WAN (f1/0) will be sourced from 1.1.1.1
+
+* ping test
+// The LAN will reach the WAN, but the WAN won't be able to ping because it is coming from an address that isn't in the routing table to get back to
+// The router knows how to get to 192.168.1.2, but not to 1.1.1.1
+                # do show ip route
+                # ip route 1.1.1.1 255.255.255.255 f1/0
+                # do show ip route
+// This static route will send traffic destined to 1.1.1.1 out interface f1/0
+
+Notes:
+- inside local = internal assigned address (e.g. private addresses)
+- inside global = public address (i.e. what the world sees the traffic coming from)
+- outside global = remote network's public address (i.e. the source address that we see remote traffic coming from)
+- outside local = remote network's internal assigned addresses (we do not see these)
