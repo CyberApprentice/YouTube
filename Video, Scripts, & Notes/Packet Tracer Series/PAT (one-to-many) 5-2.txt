@@ -1,0 +1,23 @@
+PAT: 5-2
+1. Create an ACL
+2. Designate inside/outside interfaces
+3. Apply NAT Overload
+
+R1(config)          # ip access-list standard permit-lan
+R1(config-std-nacl) # permit 192.168.1.0 0.0.0.255
+                    # ex
+R1(config)          # int f0/0
+R1(config-if)       # ip nat inside
+                    # int f1/0
+R1(config-if)       # ip nat outside
+                    # ex
+R1(config)          # ip nat inside source ?
+                    # ip nat inside source list ?
+                    # ip nat inside source list permit-lan int ?
+                    # ip nat inside source list permit-lan int f1/0 ?
+                    # ip nat inside source list permit-lan int f1/0 overload
+// In other words; apply the "permit-lan" ACL on the inside interface and use PAT (NAT overload) on the f1/0 interface
+// PAT is one-to-many; so all of the LAN addresses will translate into the inside local address. Sessions are separated by port, hence PORT address translation
+R1                  # show ip nat translations
+* ping test
+                    # show ip nat translations
