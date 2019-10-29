@@ -1,0 +1,26 @@
+1. create an ACL
+2. define inside and outside interfaces
+3. create a pool
+4. apply the pool 
+
+* ping test
+R1                  # show ip nat translations
+                    # show ip nat statistics
+                    # conf t  
+R1(config)          # ip access-list standard allow-acl
+R1(config-std-nacl) # permit 192.168.1.0 0.0.0.255
+                    # ex
+R1(config)          # int f0/0
+R1(config-if)       # ip nat inside
+                    # ip access-group allow-acl inside
+                    # int f1/0
+                    # ip nat outside
+                    # ex
+R1(config)          # ip nat pool nat-pool 123.1.0.1 123.1.0.254 netmask 255.255.255.0 
+                    # ip nat inside source list allow-acl pool nat-pool
+                    # end
+R1                  # show ip nat translations
+                    # show ip nat statistics
+* ping test
+                    # show ip nat translations
+                    # show ip nat statistics
