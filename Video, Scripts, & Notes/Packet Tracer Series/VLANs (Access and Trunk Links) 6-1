@@ -1,0 +1,96 @@
+Steps:
+    1. Create VLANs
+    2. Attach interfaces to VLANs
+        - Setup Access and Trunk ports
+    3. Enable InterVLAN routing
+IP List:
+    VLAN12:
+        - PC1 = 192.168.12.1
+        - Laptop1 = 192.168.12.2
+    VLAN23:
+        - PC2 = 192.168.12.2
+        - Laptop2 = 192.168.23.2
+
+
+
+SW1     # show vlan
+// default vlans
+        # show int switchport
+// default interface settings
+    * highlight "trunking native mode vlan: 1", "access mode vlan: 1", "negotiation of trunking" & "adminstrative mode: dynamic auto" - two dynamic autos default to access port.
+// never use the default vlan 1 (best practice)
+        # conf t
+SW1(config) # vlan ?
+            # vlan 12
+SW1(config-vlan)    # name ?
+                    # name yellow
+                    # vlan 23
+SW1(config-vlan)    # name bleu
+                    # end 
+SW1                 # show vlan
+// We see the VLANs created, but no interfaces connected.
+                    # conf t
+SW1(config)         # int g1/0/3
+SW1(config-if)      # switchport ?
+                    # switchport mode ?
+                    # switchport mode access
+                    # switchport access ?
+                    # switchport access vlan ?
+                    # switchport access vlan 12
+                    # int g1/0/2
+                    # switchport mode access
+                    # switchport access vlan 23
+                    # end
+SW1                 # show vlan ?
+                    # show vlan brief
+// Now PC1 is in VLAN12 and PC2 is in VLAN 23.
+                    # show int g1/0/2 switchport
+                        * highlight administrative mode: static access, access mode vlan: 23 (bleu), negotiation of trunking: off
+// Remember that Laptop 1 is still in VLAN 1. Even though they are in the same subnet, the cannot communicate because VLAN is L2 segmentation.
+*ping test
+// We will now configure the other side to reflect the diagram.
+// The process is the same, so the process will be sped up.
+
+SW2(config)         # vlan 12
+SW2(config-vlan)    # name yellow
+                    # vlan 23
+SW2(config-vlan)    # name bleu
+                    # int g1/0/3
+SW2(config-if)      # switchport mode access
+                    # switchport access vlan 12
+                    # int g1/0/2
+                    # switchport mode access
+                    # switchport access vlan 23
+                    # end
+SW2                 # show vlan brief
+// The g1/0/1 will be our trunk link; which carries all of the VLANs 
+                    # conf t
+SW2(config)         # int g1/0/1
+SW2(config-if)      # switchport trunk encapsulation dot1q
+                    # switchport mode trunk
+                    # switchport trunk native vlan 66
+// Its good practice to change your trunk links native VLAN.
+// native vlan is only relevant to trunk links
+                    # vlan 66
+SW2(config-vlan)     # name NATIVE-VLAN
+                    # end   
+                    # show int f1/0/1 switchport    
+                        * highlight administrative mode: trunk, trunking native mode vlan: 66 (NATIVE-VLAN)"
+                    # show vlan brief
+// notice how the interface isn't listed. This is because trunk ports are not shown using this command set.
+                    # show int trunk
+                        * highlight g1/0/1 trunking status
+// Now we go back to SW1 to setup the trunk and match the native VLAN to prevent Spanning tree errors.
+
+SW1                 # conf t
+SW1(config)         # int g1/0/1
+SW1(config-if)      # 
+SW1(config-if)      # switchport trunk encapsulation dot1q
+                    # switchport mode trunk
+                    # switchport trunk native vlan 66
+                    # vlan 66
+SW1(config-vlan)    # name NATIVE-VLAN
+                    # ex
+SW1                 # show int g1/0/1 switchport
+                         * highlight "trunking native mode vlan: 66 (NATIVE-VLAN)" and "Administrative mode: trunk"
+* ping test

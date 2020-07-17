@@ -1,0 +1,18 @@
+// SVI (switching virtual interfaces) are simply vlans with an IP address
+
+1. Assign 
+
+// the LAN hosts need a gateway to route
+            # int vlan 24
+            # ip addr 192.168.1.1 255.255.255.0
+            # int vlan 65 
+            # ip addr 192.168.2.1 255.255.255.0
+// Create a common VLAN to route between network devices
+            # vlan 66
+            # name routing-vlan
+            # ex
+            # int vlan 66
+            # ip addr 1.1.1.1 255.255.255.252
+SW1(config)# ip routing
+            # ip route 192.168.1.0 255.255.255.0
+            #
